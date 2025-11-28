@@ -9,24 +9,38 @@
 
 @theme {
   --shadow-layer: 0 35px 60px -15px rgba(0, 0, 0, 0.3);
+  --shadow-soft: 0 10px 40px -10px rgba(139, 92, 246, 0.2);
 
-  --color-framework: #000;
-  --color-black: #0b0b0b;
+  --color-black: #0d0e12;
   --color-white: #fff;
-  --color-brand: #f50;
-  --color-blue: #0052ff;
-  --color-yellow: #cdea19;
-  --color-gray-50: #f6f6f8;
-  --color-gray-100: #eeeef1;
-  --color-gray-200: #e3e4e8;
-  --color-gray-300: #bbbdc9;
-  --color-gray-400: #9499ad;
-  --color-gray-500: #727892;
-  --color-gray-600: #515870;
-  --color-gray-700: #383d51;
-  --color-gray-800: #252837;
-  --color-gray-900: #1b1d27;
-  --color-gray-950: #13141b;
+  --color-cream: #faf8f5;
+
+  /* Primary - Purple */
+  --color-primary: #9333ea;
+  --color-primary-light: #c084fc;
+  --color-primary-dark: #7e22ce;
+
+  /* Secondary - Coral */
+  --color-secondary: #ff6b6b;
+  --color-secondary-light: #ff8f76;
+  --color-secondary-dark: #ed4d47;
+
+  /* Accent - Amber */
+  --color-accent: #f59e0b;
+  --color-accent-light: #fbbf24;
+  --color-accent-dark: #d97706;
+
+  /* Warm Grays */
+  --color-warm-50: #fafaf9;
+  --color-warm-100: #f5f5f4;
+  --color-warm-200: #e7e5e4;
+  --color-warm-300: #d6d3d1;
+  --color-warm-400: #a8a29e;
+  --color-warm-500: #78716c;
+  --color-warm-600: #57534e;
+  --color-warm-700: #44403c;
+  --color-warm-800: #292524;
+  --color-warm-900: #1c1917;
 
   --font-display: 'Inter', 'sans-serif';
   --font-sans: 'Inter', 'sans-serif';
