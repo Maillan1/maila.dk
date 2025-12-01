@@ -45,6 +45,7 @@ export const post = defineType({
       name: 'coverImage',
       title: 'Cover Image',
       type: 'image',
+      description: 'Optional cover image for the post',
       options: {
         hotspot: true,
         aiAssist: {
@@ -68,7 +69,6 @@ export const post = defineType({
           },
         },
       ],
-      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'date',
