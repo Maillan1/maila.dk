@@ -29,3 +29,7 @@ next-env.d.ts
 
 # VS Code
 .vscode
+
+# WordPress migration (temporary data)
+wordpress-backup/
+wordpress-posts.json
