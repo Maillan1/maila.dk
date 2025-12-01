@@ -109,8 +109,8 @@ function htmlToBlocks(html) {
     .replace(/\\'/g, "'")         // Escaped single quotes
     .replace(/\\\\/g, '\\');      // Double backslash to single
 
-  // Extract images before processing
-  const images = extractImages(html);
+  // Extract images AFTER cleaning escape sequences
+  const images = extractImages(cleanHtml);
 
   // Replace image tags with placeholders
   for (let i = 0; i < images.length; i++) {
