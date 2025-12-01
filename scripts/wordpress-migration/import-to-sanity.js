@@ -28,6 +28,14 @@ console.log(`Dataset: ${process.env.NEXT_PUBLIC_SANITY_DATASET}\n`);
 // Load extracted posts
 const posts = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'wordpress-posts.json'), 'utf8'));
 
+// Load image mapping
+let imageMapping = {};
+const imageMappingPath = path.join(__dirname, '..', '..', 'image-mapping.json');
+if (fs.existsSync(imageMappingPath)) {
+  imageMapping = JSON.parse(fs.readFileSync(imageMappingPath, 'utf8'));
+  console.log(`📷 Loaded ${Object.keys(imageMapping).length} image mappings\n`);
+}
+
 console.log(`📚 Loaded ${posts.length} posts from wordpress-posts.json\n`);
 
 // Initialize Turndown
@@ -56,6 +64,30 @@ function processShortcodes(html) {
   return html;
 }
 
+// Extract images from HTML and create Sanity image blocks
+function extractImages(html) {
+  const images = [];
+
+  // Find all img tags with escaped quotes
+  const imgMatches = html.matchAll(/<img[^>]+src=\\*["']([^"'\\]+)\\*["'][^>]*>/gi);
+
+  for (const match of imgMatches) {
+    const imgTag = match[0];
+    const url = match[1];
+
+    // Check if we have this image in Sanity
+    if (imageMapping[url]) {
+      images.push({
+        tag: imgTag,
+        url: url,
+        assetId: imageMapping[url]
+      });
+    }
+  }
+
+  return images;
+}
+
 // Convert HTML to Sanity blocks with formatting preserved
 function htmlToBlocks(html) {
   if (!html) return [];
@@ -69,6 +101,14 @@ function htmlToBlocks(html) {
     .replace(/\\'/g, "'")         // Escaped single quotes
     .replace(/\\\\/g, '\\');      // Double backslash to single
 
+  // Extract images before processing
+  const images = extractImages(html);
+
+  // Replace image tags with placeholders
+  for (let i = 0; i < images.length; i++) {
+    cleanHtml = cleanHtml.replace(images[i].tag, `__IMAGE_PLACEHOLDER_${i}__`);
+  }
+
   // Process WordPress shortcodes
   cleanHtml = processShortcodes(cleanHtml);
 
@@ -76,7 +116,40 @@ function htmlToBlocks(html) {
   const markdown = turndownService.turndown(cleanHtml);
 
   // Parse Markdown to Sanity blocks
-  return markdownToBlocks(markdown);
+  const blocks = markdownToBlocks(markdown);
+
+  // Replace image placeholders with Sanity image blocks
+  const finalBlocks = [];
+  for (const block of blocks) {
+    // Check if block contains image placeholder
+    const text = block.children?.[0]?.text || '';
+    const placeholderMatch = text.match(/__IMAGE_PLACEHOLDER_(\d+)__/);
+
+    if (placeholderMatch) {
+      const imageIndex = parseInt(placeholderMatch[1]);
+      const image = images[imageIndex];
+
+      // Add Sanity image block
+      finalBlocks.push({
+        _type: 'image',
+        _key: nanoid(),
+        asset: {
+          _type: 'reference',
+          _ref: image.assetId
+        }
+      });
+
+      // If there's text after the placeholder, keep that in a new block
+      const remainingText = text.replace(/__IMAGE_PLACEHOLDER_\d+__/, '').trim();
+      if (remainingText) {
+        finalBlocks.push(createBlock('normal', remainingText));
+      }
+    } else {
+      finalBlocks.push(block);
+    }
+  }
+
+  return finalBlocks;
 }
 
 // Parse Markdown and create Sanity blocks with formatting

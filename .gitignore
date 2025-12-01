@@ -33,3 +33,4 @@ next-env.d.ts
 # WordPress migration (temporary data)
 wordpress-backup/
 wordpress-posts.json
+image-mapping.json
