@@ -53,11 +53,19 @@ function processShortcodes(html) {
     (match, content) => {
       // Extract image tag if present
       const imgMatch = content.match(/<img[^>]*>/i);
+      const imgTag = imgMatch ? imgMatch[0] : '';
+
       // Extract caption text (everything after the img tag)
       const captionText = content.replace(/<img[^>]*>/i, '').trim();
 
-      // Return the image and caption as a blockquote
-      return `<blockquote>${captionText}</blockquote>`;
+      // Return both the image and caption text as a blockquote
+      if (imgTag && captionText) {
+        return `${imgTag}<blockquote>${captionText}</blockquote>`;
+      } else if (imgTag) {
+        return imgTag;
+      } else {
+        return `<blockquote>${captionText}</blockquote>`;
+      }
     }
   );
 
