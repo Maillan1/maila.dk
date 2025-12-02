@@ -37,7 +37,7 @@ export default function Footer() {
           </div>
 
           <p className="text-warm-600 text-sm">
-            © {currentYear} Maila Walmod. All rights reserved.
+            © {currentYear} Maila Walmod. Alle rettigheder forbeholdes.
           </p>
         </div>
       </div>

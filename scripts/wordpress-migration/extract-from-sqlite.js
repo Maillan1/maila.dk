@@ -49,15 +49,56 @@ const postsWithMeta = posts.map(post => {
   // Generate excerpt from content if excerpt is empty
   let excerpt = post.excerpt;
   if (!excerpt || excerpt.trim() === '') {
-    // Strip HTML and take first 160 characters
-    const textContent = post.content
-      .replace(/<[^>]*>/g, '')  // Remove HTML tags
-      .replace(/\s+/g, ' ')      // Normalize whitespace
-      .trim();
-    excerpt = textContent.substring(0, 160);
-    if (textContent.length > 160) {
+    // Clean and strip HTML from content
+    let cleanContent = post.content;
+
+    // First decode SQL escape sequences
+    cleanContent = cleanContent
+      .replace(/\\r\\n/g, '\n')
+      .replace(/\\n/g, '\n')
+      .replace(/\\r/g, '\n')
+      .replace(/\\"/g, '"')
+      .replace(/\\'/g, "'")
+      .replace(/\\\\/g, '\\');
+
+    // Remove WordPress shortcodes like [caption]...[/caption]
+    cleanContent = cleanContent.replace(/\[caption[^\]]*\][\s\S]*?\[\/caption\]/gi, '');
+    cleanContent = cleanContent.replace(/\[[^\]]+\]/g, '');
+
+    // Strip HTML tags
+    cleanContent = cleanContent.replace(/<[^>]*>/g, '');
+
+    // Decode HTML entities
+    cleanContent = cleanContent
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#039;/g, "'")
+      .replace(/&[a-z]+;/gi, ' ');
+
+    // Normalize whitespace
+    cleanContent = cleanContent.replace(/\s+/g, ' ').trim();
+
+    // Take first 160 characters
+    excerpt = cleanContent.substring(0, 160);
+    if (cleanContent.length > 160) {
       excerpt += '...';
     }
+  } else {
+    // Clean existing excerpt too
+    excerpt = excerpt
+      .replace(/\\r\\n/g, '\n')
+      .replace(/\\n/g, '\n')
+      .replace(/\\r/g, '\n')
+      .replace(/\[caption[^\]]*\][\s\S]*?\[\/caption\]/gi, '')
+      .replace(/\[[^\]]+\]/g, '')
+      .replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&[a-z]+;/gi, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 
   return {

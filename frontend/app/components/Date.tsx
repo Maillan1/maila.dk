@@ -1,4 +1,5 @@
 import {format} from 'date-fns'
+import {da} from 'date-fns/locale'
 
 export default function DateComponent({dateString}: {dateString: string | undefined}) {
   if (!dateString) {
@@ -7,7 +8,7 @@ export default function DateComponent({dateString}: {dateString: string | undefi
 
   return (
     <time dateTime={dateString} className="">
-      {format(new Date(dateString), 'LLLL	d, yyyy')}
+      {format(new Date(dateString), 'd. MMMM yyyy', {locale: da})}
     </time>
   )
 }

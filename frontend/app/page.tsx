@@ -36,14 +36,14 @@ export default async function Page() {
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-12">
             {/* Blog Posts */}
             <main>
-              <h2 className="text-3xl font-bold text-warm-900 mb-8">Latest Posts</h2>
-              <Suspense fallback={<div className="text-warm-600">Loading posts...</div>}>
+              <h2 className="text-3xl font-bold text-warm-900 mb-8">Seneste indlæg</h2>
+              <Suspense fallback={<div className="text-warm-600">Indlæser indlæg...</div>}>
                 {await AllPosts()}
               </Suspense>
             </main>
 
             {/* Sidebar */}
-            <Suspense fallback={<div className="text-warm-600">Loading...</div>}>
+            <Suspense fallback={<div className="text-warm-600">Indlæser...</div>}>
               {await Sidebar()}
             </Suspense>
           </div>

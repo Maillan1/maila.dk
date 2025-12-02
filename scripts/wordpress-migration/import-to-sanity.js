@@ -154,7 +154,7 @@ function htmlToBlocks(html) {
         finalBlocks.push(createBlock('normal', textBefore));
       }
 
-      // Add Sanity image block
+      // Add Sanity image block or placeholder for missing image
       if (image && image.assetId) {
         finalBlocks.push({
           _type: 'image',
@@ -164,6 +164,9 @@ function htmlToBlocks(html) {
             _ref: image.assetId
           }
         });
+      } else if (image) {
+        // Image exists in HTML but wasn't uploaded - add placeholder
+        finalBlocks.push(createBlock('blockquote', '_Billede mangler - kommer snart tilbage_'));
       }
 
       // If there's text after the placeholder, keep that in a new block

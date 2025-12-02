@@ -19,10 +19,10 @@ const client = createClient({
 });
 
 async function setAuthor() {
-  console.log('📝 Setting author to Maila Walmod...\n');
+  console.log('📝 Setting author...\n');
 
-  // Use person-maila-walmod (the one with proper name)
-  const authorId = 'person-maila-walmod';
+  // Use existing person - NEVER create new ones
+  const authorId = 'afbc856d-8a00-424f-9e63-add812dad057';
   const author = await client.getDocument(authorId);
 
   console.log(`✅ Using author: ${author.name}`);
