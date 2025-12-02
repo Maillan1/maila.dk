@@ -9,8 +9,12 @@
  */
 
 import {PortableText, type PortableTextComponents, type PortableTextBlock} from 'next-sanity'
+import {stegaClean} from '@sanity/client/stega'
+import {Image} from 'next-sanity/image'
+import {getImageDimensions} from '@sanity/asset-utils'
 
 import ResolvedLink from '@/app/components/ResolvedLink'
+import {urlForImage} from '@/sanity/lib/utils'
 
 export default function CustomPortableText({
   className,
@@ -77,6 +81,31 @@ export default function CustomPortableText({
     marks: {
       link: ({children, value: link}) => {
         return <ResolvedLink link={link}>{children}</ResolvedLink>
+      },
+    },
+    types: {
+      image: ({value}) => {
+        if (!value?.asset?._ref) {
+          return null
+        }
+
+        return (
+          <figure className="my-8">
+            <Image
+              className="w-full h-auto rounded-lg"
+              width={getImageDimensions(value).width}
+              height={getImageDimensions(value).height}
+              alt={stegaClean(value?.alt) || ''}
+              src={urlForImage(value)?.url() as string}
+              sizes="(max-width: 768px) 100vw, 768px"
+            />
+            {value.alt && (
+              <figcaption className="mt-2 text-center text-sm text-warm-600">
+                {stegaClean(value.alt)}
+              </figcaption>
+            )}
+          </figure>
+        )
       },
     },
   }

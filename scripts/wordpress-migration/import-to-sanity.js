@@ -121,7 +121,14 @@ function htmlToBlocks(html) {
   cleanHtml = processShortcodes(cleanHtml);
 
   // Convert HTML to Markdown
-  const markdown = turndownService.turndown(cleanHtml);
+  let markdown = turndownService.turndown(cleanHtml);
+
+  // Turndown converts <a><img/></a> to [__PLACEHOLDER__](url)
+  // Extract these back to just placeholders
+  markdown = markdown.replace(/\[(__IMAGE_PLACEHOLDER_\d+__)\]\([^)]+\)/g, '$1');
+
+  // Turndown also escapes underscores - unescape them in placeholders
+  markdown = markdown.replace(/\\_\\_IMAGE_PLACEHOLDER_(\d+)\\_\\_/g, '__IMAGE_PLACEHOLDER_$1__');
 
   // Parse Markdown to Sanity blocks
   const blocks = markdownToBlocks(markdown);
@@ -129,26 +136,38 @@ function htmlToBlocks(html) {
   // Replace image placeholders with Sanity image blocks
   const finalBlocks = [];
   for (const block of blocks) {
-    // Check if block contains image placeholder
-    const text = block.children?.[0]?.text || '';
-    const placeholderMatch = text.match(/__IMAGE_PLACEHOLDER_(\d+)__/);
+    // Check if block contains image placeholder - check ALL children text
+    let fullText = '';
+    if (block.children) {
+      fullText = block.children.map(child => child.text || '').join('');
+    }
+
+    const placeholderMatch = fullText.match(/__IMAGE_PLACEHOLDER_(\d+)__/);
 
     if (placeholderMatch) {
       const imageIndex = parseInt(placeholderMatch[1]);
       const image = images[imageIndex];
 
+      // Check if there's text before the placeholder
+      const textBefore = fullText.split('__IMAGE_PLACEHOLDER_')[0].trim();
+      if (textBefore) {
+        finalBlocks.push(createBlock('normal', textBefore));
+      }
+
       // Add Sanity image block
-      finalBlocks.push({
-        _type: 'image',
-        _key: nanoid(),
-        asset: {
-          _type: 'reference',
-          _ref: image.assetId
-        }
-      });
+      if (image && image.assetId) {
+        finalBlocks.push({
+          _type: 'image',
+          _key: nanoid(),
+          asset: {
+            _type: 'reference',
+            _ref: image.assetId
+          }
+        });
+      }
 
       // If there's text after the placeholder, keep that in a new block
-      const remainingText = text.replace(/__IMAGE_PLACEHOLDER_\d+__/, '').trim();
+      const remainingText = fullText.replace(/__IMAGE_PLACEHOLDER_\d+__/, '').replace(textBefore, '').trim();
       if (remainingText) {
         finalBlocks.push(createBlock('normal', remainingText));
       }
@@ -238,6 +257,10 @@ function parseInlineFormatting(text) {
   const children = [];
   let currentText = '';
   let i = 0;
+
+  // Unescape markdown escaped underscores in placeholders
+  text = text.replace(/\\_\\_IMAGE_PLACEHOLDER_(\d+)\\_\\_/g, '__IMAGE_PLACEHOLDER_$1__');
+  text = text.replace(/\\_/g, '_');
 
   function addTextSpan(content, marks = []) {
     if (content) {

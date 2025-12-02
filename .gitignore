@@ -34,3 +34,4 @@ next-env.d.ts
 wordpress-backup/
 wordpress-posts.json
 image-mapping.json
+wordpress.db
