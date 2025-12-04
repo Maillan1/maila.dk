@@ -27,7 +27,7 @@ export default async function Header() {
                   href="/"
                   className="text-warm-800 hover:text-purple-600 transition-colors duration-200 font-medium"
                 >
-                  Home
+                  Hjem
                 </Link>
               </li>
               <li>
@@ -43,7 +43,7 @@ export default async function Header() {
                   href="/about"
                   className="text-warm-800 hover:text-purple-600 transition-colors duration-200 font-medium"
                 >
-                  About
+                  Om
                 </Link>
               </li>
             </ul>
